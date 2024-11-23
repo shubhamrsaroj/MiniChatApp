@@ -83,6 +83,9 @@
     
                         console.log("Connected with username:", username);
                  });
+
+
+
             
             const messagelist=document.getElementById("message-list");
             const sendmessage=document.getElementById("send-message");
@@ -109,6 +112,19 @@
 
             }
         );
+
+        socket.on('load_messages',(messages)=>{
+            messages.forEach(message=>{
+
+                const mymessage=document.createElement("div");
+            mymessage.innerText=new Date(message.timestamp).toDateString()+ message.username+":"+message.message;
+        mymessage.classList.add("send-message");
+            messagelist.appendChild(mymessage);
+
+            })
+        })
+
+
 
         socket.on("broadcast_message",(userMessage)=>{
             const mymessage=document.createElement("div");
