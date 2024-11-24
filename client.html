@@ -4,8 +4,8 @@
         <style>
 
             #arena{
-                width: 400px;
-                height: 400px;
+                width: 500px;
+                height: 700px;
                 background-color: black;
                 border-radius: 5px;
             }
@@ -13,8 +13,8 @@
             #message-input{
                 width: 200px;
                 height: 30px;
-                margin-top: 350px;
-                margin-left: 25px;
+                margin-top: 650px;
+                margin-left: 40px;
                 border-radius: 4px;
 
             }  
@@ -33,7 +33,7 @@
                 overflow-y: auto;
                 overflow-x: auto;
                 width: 300px;
-                height: 300px;
+                height: 610px;
                 position: absolute;
                 top: 30px;
                 left: 40px;
@@ -48,6 +48,34 @@
             transition: width 0.2s; /* Smooth transition for width change */
             }
 
+            #mysidebar{
+                width: 150px;
+                height: 610px;
+                background-color: blueviolet;
+                position:absolute;
+                left: 350px;
+                top: 30px;
+                border-radius: 10px;
+            }
+
+            #profile-image{
+                width: 100px;
+                height: 100px;
+                background-color: black;
+                position: absolute;
+                border-radius: 60px;
+                top: 20px;
+                left: 25px;
+            }
+
+            #myavatar{
+                position: absolute;
+                top: 130px;
+                left: 20px;
+                border-radius: 3px;
+                background-color: palevioletred;
+
+            }
 
 
 
@@ -64,6 +92,19 @@
             </div>
             <input type="text" id="message-input">
             <button id="send-message">Send</button>
+
+        </div>
+
+        <div id="mysidebar">
+
+            <div id="profile-image">
+               
+            </div>
+
+            <button id="myavatar">Change Avatar</buttoN>
+
+
+
         </div>
 
      
@@ -93,11 +134,11 @@
 
 
 
-            sendmessage.addEventListener("click",function(){
+            sendmessage.addEventListener("click",function(event){
 
                 const message=messageinput.value;
 
-                if(message){
+                if(message ){
                     socket.emit('new_message',message);
 
                     const mymessage=document.createElement("div");
@@ -112,6 +153,16 @@
 
             }
         );
+
+
+        
+        messageinput.addEventListener("keypress",function(e){
+            if(e.key==="Enter"){
+
+                sendmessage.click();
+            }
+
+        })
 
         socket.on('load_messages',(messages)=>{
             messages.forEach(message=>{
