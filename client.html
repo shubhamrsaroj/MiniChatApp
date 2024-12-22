@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+
+            #arena{
+                width: 500px;
+                height: 730px;
+                background-color: black;
+                border-radius: 5px;
+            }
+
+            #message-input{
+                width: 200px;
+                height: 30px;
+                margin-top: 670px;
+                margin-left: 40px;
+                border-radius: 4px;
+
+            }  
+
+            #send-message{
+                width: 100px;
+                height: 30px;
+                margin-top: 130px;
+                margin-left: 10px;
+                background-color: violet;
+                border-radius: 10px;
+
+            }
+
+            #message-list{
+                overflow-y: auto;
+                overflow-x: auto;
+                width: 300px;
+                height: 610px;
+                position: absolute;
+                top: 30px;
+                left: 40px;
+                background-color: blueviolet;
+            }
+
+            .send-message{
+            min-width: 100px; /* Minimum width /
+            padding: 5px; / Padding for better appearance /
+           border: 2px solid #ccc; / Border styling /
+           border-radius: 4px; / Rounded corners /
+            transition: width 0.2s; / Smooth transition for width change */
+            }
+
+            #mysidebar{
+                width: 150px;
+                height: 610px;
+                background-color: blueviolet;
+                position:absolute;
+                left: 350px;
+                top: 30px;
+                border-radius: 10px;
+                overflow: auto;
+            }
+
+            #profile-image{
+                width: 100px;
+                height: 100px;
+                background-color: black;
+                position: absolute;
+                border-radius: 60px;
+                top: 20px;
+                left: 25px;
+            }
+
+            #myavatar{
+                position: absolute;
+                top: 130px;
+                left: 20px;
+                border-radius: 3px;
+                background-color: palevioletred;
+
+            }
+
+            
+
+            #mycolor{
+                color: white;
+                display: none;
+            }
+
+            #myusers{
+
+                position: absolute;
+                top: 140px;
+                left: 20px;
+                border-radius: 3px;
+                background-color: rgb(118, 4, 176);
+                border-color: black;
+                border-style: solid;
+                padding: 10px;
+                color: yellow;
+
+            }
+
+            
+            #onlineUsers{
+
+              margin-top: 220px;
+            
+            }
+            #onlineUser{
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            border-radius: 5px;
+            margin: 5px 0;
+            
+
+            }
+
+            .typingindicator{
+            color: greenyellow;
+            font-style: italic;
+            padding: 5px 15px;
+            min-height: 20px;
+            }
+             
+
+        </style>
+        <title>Chat App</title>
+    </head>
+
+    <body>
+
+        <div id="arena">
+            <div id="message-list">
+
+            </div>
+            <input type="text" id="message-input">
+            <button id="send-message">Send</button>
+            
+            <div class="typingindicator">
+                
+                <p id="mycolor">hello</p>
+
+            </div>
+        </div>
+
+        <div id="mysidebar">
+
+            <div id="profile-image">
+
+            </div>
+
+            <button id="myavatar">Change Avatar</button>
+
+            <p id="myusers">Online Users</p>
+
+            <div id="onlineUsers">
+
+                <div id="onlineUsersList"></div> 
+
+
+            </div>
+
+        </div>
+
+        <script src="http://localhost:3400/socket.io/socket.io.js"></script>
+
+        <script>
+            const socket=io.connect('http://localhost:3400');
+            const username=prompt("Enter your username");
+
+                socket.on('connect', () => {
+
+                       socket.emit("join", username);
+
+                        console.log("Connected with username:", username);
+                 });
+
+            const messagelist=document.getElementById("message-list");
+            const sendmessage=document.getElementById("send-message");
+            const messageinput=document.getElementById("message-input");
+            const onlineUsersList=document.getElementById("onlineUsersList");
+            const typingindicator=document.querySelector('.typingindicator');
+            let mytimeout;
+
+            sendmessage.addEventListener("click",function(event){
+
+                const message=messageinput.value;
+
+                if(message ){
+                    socket.emit('new_message',message);
+
+                    const mymessage=document.createElement("div");
+                    mymessage.innerText=username + ":"+message;
+                    mymessage.classList.add("send-message");
+
+                    messagelist.appendChild(mymessage);
+
+                    messageinput.value="";
+
+                }
+
+            }
+        );
+
+        messageinput.addEventListener("keypress",function(e){
+            if(e.key==="Enter"){
+
+                sendmessage.click();
+            }
+
+        })
+
+
+
+        //typing indicator        
+       
+
+
+        messageinput.addEventListener('input',()=>{
+          
+         socket.emit('typing');   
+          
+         clearTimeout(mytimeout); 
+         
+         mytimeout=setTimeout(()=>{
+            socket.emit('stop_typing');
+         },1000);
+         
+
+        })
+
+        socket.on('user_typing', (username) => {
+        typingindicator.textContent = `${username} is typing...`;
+        typingindicator.style.display = 'block';
+        });
+
+         socket.on('user_stop_typing', (username) => {
+          typingindicator.textContent = '';
+          typingindicator.style.display = 'none';
+          });
+
+        socket.on("online_users",(users)=>{
+            onlineUsersList.innerHTML="";
+
+            users.forEach(user=>{
+            
+        const onlineuser = document.createElement('div');
+        onlineuser.id = 'onlineUser'; // Use the CSS ID you defined
+        onlineuser.innerHTML = `<p>&#x1F7E2</p><span id="myname">${user.username}</span>`;
+        onlineUsersList.appendChild(onlineuser);
+
+            })
+
+
+        })
+
+        socket.on('load_messages',(messages)=>{
+            messages.forEach(message=>{
+
+                const mymessage=document.createElement("div");
+            mymessage.innerText=new Date(message.timestamp).toDateString()+ message.username+":"+message.message;
+        mymessage.classList.add("send-message");
+            messagelist.appendChild(mymessage);
+
+            })
+        })
+
+        socket.on("broadcast_message",(userMessage)=>{
+            const mymessage=document.createElement("div");
+            mymessage.innerText=userMessage.username+":"+userMessage.message;
+        mymessage.classList.add("send-message");
+            messagelist.appendChild(mymessage);
+        })
+
+        </script>
+
+    </body>
