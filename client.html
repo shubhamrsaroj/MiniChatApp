@@ -121,6 +121,45 @@
             padding: 5px 15px;
             min-height: 20px;
             }
+
+            #video-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+#video-grid video {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 8px;
+}
+
+#call-controls {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.video-call-btn {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#call-chat {
+    margin-top: 20px;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+}
+
+#call-messages {
+    height: 150px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
              
 
         </style>
@@ -272,6 +311,7 @@
             messagelist.appendChild(mymessage);
         })
 
+        
         </script>
 
     </body>
